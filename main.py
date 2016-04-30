@@ -1,6 +1,7 @@
 ﻿import logging
 logging.basicConfig(level=logging.INFO)
 
+import json
 
 import discord
 from discord.ext import commands
@@ -11,7 +12,8 @@ from discord.enums import ChannelType
 
 import mchelper
 
-import json
+import datastore
+import tags
 
 TOKEN = "Token"
 CLIENT_ID = 9999999999999
@@ -456,11 +458,11 @@ async def img(board : str, search : str):
 try:
     with open('auth.json', 'r') as fp:
         auth = json.load(fp)
-        if "CLIENT_ID" in auth.keys():
+        if "CLIENT_ID" in auth:
             CLIENT_ID = auth["CLIENT_ID"]
         else:
             raise MissingAuth
-        if "TOKEN" in auth.keys():
+        if "TOKEN" in auth:
             TOKEN = auth["TOKEN"]
         else:
             raise MissingAuth

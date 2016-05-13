@@ -4,12 +4,13 @@ import os
 import urllib.request
 import json
 import string
-
-playerdatafolder = "/home/minecraft/minecraft/Boskrill/playerdata"
+import datastore
+from discord.ext import commands
+import discord.utils
 
 
 mcserver = MinecraftServer("127.0.0.1", 25565)
-
+playerdatafolder = "/home/minecraft/minecraft/Boskrill/playerdata"
 
 dimensions = {-1 : 'Nether', 0 : 'Overworld', 1 : 'End'}
 
@@ -61,6 +62,84 @@ def getplayerpos(player):
            return(nbtfile['Pos'][0].value, nbtfile['Pos'][1].value, nbtfile['Pos'][2].value, dim)
    except FileNotFoundError:
        raise UnknownPlayerException
+
+
+
+class MCHelper:
+    bot = None
+
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.bot.command(pass_context=True)
+    async def status(self, ctx):
+        try:
+            status = mcserver.status()
+            await self.bot.say("Boskrill has {0} players and replied in {1} ms".format(status.players.online, status.latency))
+        except:
+            await self.bot.say("Boskrill is currently not responding!")
+
+
+    @commands.bot.command(pass_context=True)
+    async def online(self, ctx):
+        try:
+            status = mcserver.query()
+            #await self.bot.say("Boskrill has {0} players and replied in {1} ms".format(status.players.online, status.latency))
+            await self.bot.say(dir(status))
+        except:
+            await self.bot.say("Boskrill is currently not responding!")
+
+
+    @commands.bot.command(pass_context=True)
+    async def location(self, ctx, player : str):
+        """Get a player's coordinates and dimension."""
+        try:
+            pos = getplayerpos(player)
+            dim = 0
+            if pos[3] == "Nether":
+                dim = 1
+            elif pos[3] == "End":
+                dim = 2
+            await self.bot.say("%s was last seen at %d %d %d in the %s\n--> " % (player, pos[0], pos[1], pos[2], pos[3]) + mapurl % (pos[0], pos[1], pos[2], dim))
+        except UnknownPlayerException:
+            await self.bot.say(errormessages['unknownplayer'])
+        except MojangAPIException:
+            await self.bot.say(errormessages['http'])
+        except InvalidNameException:
+            await self.bot.say(errormessages['invalidplayer'])
+
+
+    @commands.group(pass_context=True, invoke_without_command=True)
+    @commands.has_role('op')
+    async def whitelist(self, ctx):
+        """Manage the whitelist."""
+        if ctx.invoked_subcommand is None:
+            await self.bot.say('What do you want me to do with the whitelist?')
+
+
+    @whitelist.command(pass_context=True)
+    @commands.has_role('op')
+    async def add(self, name : str):
+        """Add someone to the whitelist."""
+        if (0 < len(name) <= 16) and checkname(name) and name is not None:
+            await self.bot.say('This will eventually add {0} to the whitelist'.format(name))
+        else:
+            await self.bot.say(errormessages['unknownplayer'])
+
+
+    @whitelist.command(pass_context=True)
+    @commands.has_role('op')
+    async def remove(self, name : str):
+        """Remove someone from the whitelist."""
+        if (0 < len(name) <= 16) and checkname(name) and name is not None:
+            await self.bot.say('This will eventually remove {0} from the whitelist'.format(name))
+        else:
+            await self.bot.say(errormessages['unknownplayer'])
+
+
+
+def setup(bot):
+    bot.add_cog(MCHelper(bot))
 
 
 if __name__ == "__main__":

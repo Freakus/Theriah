@@ -10,8 +10,6 @@ import random
 from discord.errors import *
 from discord.enums import ChannelType
 
-import mchelper
-
 import datastore
 import tags
 
@@ -79,6 +77,7 @@ description = '''A friendly magical otter from the village of Boskrill.
 There are a number of things he can do for you:'''
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('?'), description=description, pm_help=True)
 bot.load_extension('tags')
+bot.load_extension('mchelper')
 
 @bot.event
 async def on_ready():
@@ -134,72 +133,6 @@ async def choose(*choices : str):
 async def joined(member : discord.Member):
     """Says when a member joined."""
     await bot.say('{0.name} joined in {0.joined_at}'.format(member))
-
-
-
-
-@bot.command()
-async def status():
-    try:
-        status = mchelper.mcserver.status()
-        await bot.say("Boskrill has {0} players and replied in {1} ms".format(status.players.online, status.latency))
-    except:
-        await bot.say("Boskrill is currently not responding!")
-
-
-
-
-@bot.command()
-async def location(player : str):
-    """Get a player's coordinates and dimension."""
-    try:
-        pos = mchelper.getplayerpos(player)
-        dim = 0
-        if pos[3] == "Nether":
-            dim = 1
-        elif pos[3] == "End":
-            dim = 2
-        await bot.say("%s was last seen at %d %d %d in the %s\n--> " % (player, pos[0], pos[1], pos[2], pos[3]) + mapurl % (pos[0], pos[1], pos[2], dim))
-    except mchelper.UnknownPlayerException:
-        await bot.say(errormessages['unknownplayer'])
-    except mchelper.MojangAPIException:
-        await bot.say(errormessages['http'])
-    except mchelper.InvalidNameException:
-        await bot.say(errormessages['invalidplayer'])
-
-
-
-
-@bot.group(pass_context=True, invoke_without_command=True)
-@commands.has_role('op')
-async def whitelist(ctx):
-    """Manage the whitelist."""
-    if ctx.invoked_subcommand is None:
-        await bot.say('What do you want me to do with the whitelist?')
-
-
-
-
-@whitelist.command()
-@commands.has_role('op')
-async def add(name : str):
-    """Add someone to the whitelist."""
-    if (0 < len(name) <= 16) and mchelper.checkname(name) and name is not None:
-        await bot.say('This will eventually add {0} to the whitelist'.format(name))
-    else:
-        await bot.say(errormessages['unknownplayer'])
-
-
-
-
-@whitelist.command()
-@commands.has_role('op')
-async def remove(name : str):
-    """Remove someone from the whitelist."""
-    if (0 < len(name) <= 16) and mchelper.checkname(name) and name is not None:
-        await bot.say('This will eventually remove {0} from the whitelist'.format(name))
-    else:
-        await bot.say(errormessages['unknownplayer'])
 
 
 

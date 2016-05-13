@@ -75,7 +75,7 @@ class MCHelper:
     async def status(self, ctx):
         try:
             status = mcserver.status()
-            await self.bot.say("Boskrill has {0} players and replied in {1} ms".format(status.players.online, status.latency))
+            await self.bot.say("Boskrill has {0} player(s) and replied in {1} ms".format(status.players.online, status.latency))
         except:
             await self.bot.say("Boskrill is currently not responding!")
 
@@ -85,7 +85,7 @@ class MCHelper:
         try:
             status = mcserver.query()
             #await self.bot.say("Boskrill has {0} players and replied in {1} ms".format(status.players.online, status.latency))
-            await self.bot.say("```python\n{0}\n\n{1}```", repr(status), str(status))
+            await self.bot.say("{0} has {1} player(s) online:\n{2}".format(status.map, status.players.online, ", ".join(status.players.names)))
         except:
             await self.bot.say("Boskrill is currently not responding!")
 

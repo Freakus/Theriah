@@ -85,7 +85,7 @@ class MCHelper:
         try:
             status = mcserver.query()
             #await self.bot.say("Boskrill has {0} players and replied in {1} ms".format(status.players.online, status.latency))
-            await self.bot.say(dir(status))
+            await self.bot.say("```python\n{0}\n\n{1}```", repr(status), str(status))
         except:
             await self.bot.say("Boskrill is currently not responding!")
 

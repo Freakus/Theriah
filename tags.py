@@ -90,7 +90,6 @@ class TagStore:
     
     def __init__(self, bot):
         self.bot = bot
-        pass
     
     def _getscope(self, serverid, channelid):
         scope = "tags-%s-%s" % (serverid, channelid)

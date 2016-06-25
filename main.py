@@ -94,6 +94,12 @@ async def on_ready():
 
 
 
+@bot.command(hidden=True)
+async def shutdown():
+    await bot.say('=P')
+    print('stuff')
+    await bot.close()
+
 
 @bot.command(hidden=True)
 async def seticon():
@@ -387,6 +393,7 @@ async def img(board : str, search : str):
         await bot.say(errormessages['http'])
     except Exception:
         await bot.say(errormessages['unknown'])
+
 
 try:
     with open('auth.json', 'r') as fp:
